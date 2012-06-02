@@ -69,6 +69,17 @@ defmodule Xonad.Test do
     assert f.() == [1,2,3]
   end
 
+  test "list xonad with lists inside" do
+    f = fn() ->
+      X.list do
+        [1,2]
+        1
+        [2,3]
+      end
+    end
+    assert f.() == [[1,2],1,[2,3]] 
+  end
+
   ##
 
   test "xonad inside a xonad" do
