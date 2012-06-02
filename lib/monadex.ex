@@ -17,8 +17,8 @@ defmodule Monad.Implementation do
     end
   end
 
-  def monad([{:do, block}], module) do
-    monad([{:do, {:__block__, 0, [block]}}], module)
+  def monad([{:do, block}], module, opts) do
+    monad([{:do, {:__block__, 0, [block]}}], module, opts)
   end
 
 
