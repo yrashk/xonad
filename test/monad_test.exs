@@ -17,7 +17,7 @@ defmodule Monad.Test do
   test "error monad with no error" do
     f = fn() ->
       M.error do
-        file = "/etc/passwd"
+        file = "test/monad_test.exs"
         {:ok, bin} = :file.read_file(file)
         bin
       end
