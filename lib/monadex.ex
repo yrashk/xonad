@@ -21,7 +21,6 @@ defmodule Monad.Implementation do
     monad([{:do, {:__block__, 0, [block]}}], module, opts)
   end
 
-
   defmacro __using__(_) do
     quote do
      def __with__(block, opts) do
@@ -60,9 +59,8 @@ defmodule Monad do
         case unquote(x) do
           :ok -> {:ok, nil}
           :error -> {:error, nil}
-          {:ok, _} = ok -> 
-            ok
-         {:error, _} = error -> error
+          {:ok, _} = ok -> ok
+          {:error, _} = error -> error
           x -> {:ok, x}
         end
      end
