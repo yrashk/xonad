@@ -16,7 +16,7 @@ defmodule Monad.Implementation do
       try do
         m = unquote(body)
         unquote(module).then(m)
-      catch type, error -> unquote(module).exception(type, error) 
+      catch type, error -> unquote(module).exception(unquote(module), type, error) 
       end
     end
   end
@@ -30,9 +30,15 @@ defmodule Monad.Implementation do
      def __with__(block, opts) do
        Monad.Implementation.monad(block, unquote(__CALLER__.module), opts)
      end
+
      def then(r), do: r
-     def exception(_, e), do: throw(e)
-     defoverridable [then: 1, exception: 2]
+ 
+     def exception(m, _,{:badmatch, {:error, _} = error}), do: m.fail(error)
+     def exception(_, _, e), do: throw(e)
+
+     def fail(v), do: throw({:badmatch, v})
+
+     defoverridable [then: 1, exception: 3, fail: 1]
     end
   end
 end
@@ -105,8 +111,12 @@ defmodule Monad do
     def empty(_) do
       quote do: {:ok, nil}
     end
-    def exception(_,{:badmatch, {:error, _} = error}), do: error
-    def exception(_,error), do: {:error, error}
+
+    def fail(v), do: v
+
+    def exception(_, _, {:badmatch, _}), do: super
+    def exception(_, _, e), do: {:error, e}
+
   end
 
   defmacro error(block), do: with(Error, block)

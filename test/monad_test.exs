@@ -83,4 +83,13 @@ defmodule Monad.Test do
     assert f.() == {:error, :enoent}
   end
 
-end
+  test "monad failure" do
+   f = fn() ->
+     M.identity do
+       1 = (fn() -> 2 end).()
+     end
+   end
+   assert_throw {:badmatch, 2}, f
+  end
+
+ end
