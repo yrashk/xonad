@@ -71,8 +71,7 @@ defmodule Monad do
       quote do
         case unquote(result) do
           :ok -> unquote(block)
-          {:ok, _} -> 
-            unquote(block)
+          {:ok, _} -> unquote(block)
           {:error, _} = error -> throw({:badmatch, error})
         end
       end
