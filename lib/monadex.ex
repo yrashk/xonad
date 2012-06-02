@@ -1,11 +1,11 @@
 defmodule Monad.Implementation do
 
-  def with(module, block) do
-      module.__with__(block)
+  def with(module, block, opts // []) do
+      module.__with__(block, opts)
   end 
 
-  def monad([{:do, {:__block__, _line, block}}], module) do
-    body = Enum.reduce block, module.empty, 
+  def monad([{:do, {:__block__, _line, block}}], module, opts) do
+    body = Enum.reduce block, module.empty(opts), 
                        fn(expr, acc) ->
                          module.bind(expr, module.return(acc))
                        end
@@ -24,8 +24,8 @@ defmodule Monad.Implementation do
 
   defmacro __using__(_) do
     quote do
-     def __with__(block) do
-       Monad.Implementation.monad(block, unquote(__CALLER__.module))
+     def __with__(block, opts) do
+       Monad.Implementation.monad(block, unquote(__CALLER__.module), opts)
      end
     end
   end
@@ -45,7 +45,7 @@ defmodule Monad do
         unquote(block)
       end
     end
-    def empty do
+    def empty(_) do
       nil
     end
     def exception(_,e), do: throw(e)
@@ -76,7 +76,7 @@ defmodule Monad do
         end
       end
     end
-    def empty do
+    def empty(_) do
       quote do: {:ok, nil}
     end
     def exception(_,{:badmatch, {:error, _} = error}), do: error
