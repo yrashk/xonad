@@ -9,11 +9,12 @@ defmodule Monad.Implementation do
                        fn(expr, acc) ->
                          module.bind(expr, module.return(acc))
                        end
-    quote do: (    
+    quote do 
       try do
         unquote(body)
       catch type, error -> unquote(module).exception(type, error) 
-      end)
+      end
+    end
   end
 
   def monad([{:do, block}], module) do
@@ -55,7 +56,7 @@ defmodule Monad do
     use Monad.Implementation
 
     def return(x) do
-     quote do: (
+     quote do
         case unquote(x) do
           :ok -> {:ok, nil}
           :error -> {:error, nil}
@@ -63,16 +64,18 @@ defmodule Monad do
             ok
          {:error, _} = error -> error
           x -> {:ok, x}
-        end)
+        end
+     end
     end
     def bind(block, result) do
-      quote do: (
+      quote do
         case unquote(result) do
           :ok -> unquote(block)
           {:ok, _} -> 
             unquote(block)
           {:error, _} = error -> throw({:badmatch, error})
-        end)
+        end
+      end
     end
     def empty do
       quote do: {:ok, nil}
