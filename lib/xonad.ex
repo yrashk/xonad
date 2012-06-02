@@ -1,10 +1,10 @@
-defmodule Monad.Implementation do
+defmodule Xonad.Implementation do
 
   def with(module, block, opts // []) do
       module.__with__(block, opts)
   end 
 
-  def monad([{:do, {:__block__, _line, block}}], module, opts) do
+  def xonad([{:do, {:__block__, _line, block}}], module, opts) do
     {:do, body} = Enum.reduce block, {:start, module.empty(opts)}, 
                        (fn do
                          expr, {:start, acc} ->
@@ -21,14 +21,14 @@ defmodule Monad.Implementation do
     end
   end
 
-  def monad([{:do, block}], module, opts) do
-    monad([{:do, {:__block__, 0, [block]}}], module, opts)
+  def xonad([{:do, block}], module, opts) do
+    xonad([{:do, {:__block__, 0, [block]}}], module, opts)
   end
 
   defmacro __using__(_) do
     quote do
      def __with__(block, opts) do
-       Monad.Implementation.monad(block, unquote(__CALLER__.module), opts)
+       Xonad.Implementation.xonad(block, unquote(__CALLER__.module), opts)
      end
 
      def then(r), do: r
@@ -43,11 +43,11 @@ defmodule Monad.Implementation do
   end
 end
 
-defmodule Monad do
-  import Monad.Implementation
+defmodule Xonad do
+  import Xonad.Implementation
 
   defmodule Identity do
-    use Monad.Implementation
+    use Xonad.Implementation
     def return(x) do
       x
     end
@@ -64,7 +64,7 @@ defmodule Monad do
   defmacro identity(block), do: with(Identity, block)
 
   defmodule List do
-    use Monad.Implementation
+    use Xonad.Implementation
 
     def return(x) do
       quote do: [unquote(x)]
@@ -86,7 +86,7 @@ defmodule Monad do
   defmacro list(block), do: with(List, block)
 
   defmodule Error do
-    use Monad.Implementation
+    use Xonad.Implementation
 
     def return(x) do
      quote do

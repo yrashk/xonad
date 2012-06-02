@@ -1,12 +1,12 @@
-require Monad
+require Xonad
 
-defmodule Monad.Test do
-  alias Monad, as: M
+defmodule Xonad.Test do
+  alias Xonad, as: X
   use ExUnit.Case 
 
-  test "identity monad" do
+  test "identity xonad" do
     f = fn() ->
-      M.identity do
+      X.identity do
         a = 1
         b = a + 1
       end
@@ -14,10 +14,10 @@ defmodule Monad.Test do
     assert f.() == 2
   end
 
-  test "error monad with no error" do
+  test "error xonad with no error" do
     f = fn() ->
-      M.error do
-        file = "test/monad_test.exs"
+      X.error do
+        file = "test/xonad_test.exs"
         {:ok, bin} = :file.read_file(file)
         bin
       end
@@ -25,9 +25,9 @@ defmodule Monad.Test do
     assert is_binary(f.())
   end
 
-  test "error monad with an error" do
+  test "error xonad with an error" do
     f = fn() ->
-      M.error do
+      X.error do
         file = "/etc/passwd-does-not-exist"
         :file.read_file(file)
         :done
@@ -36,9 +36,9 @@ defmodule Monad.Test do
     assert f.() == {:error, :enoent}
   end
 
-  test "error monad with a badmatch error" do
+  test "error xonad with a badmatch error" do
     f = fn() ->
-      M.error do
+      X.error do
         file = "/etc/passwd-does-not-exist"
         {:ok, bin} = :file.read_file(file)
         bin
@@ -47,9 +47,9 @@ defmodule Monad.Test do
     assert f.() == {:error, :enoent}
   end
 
-  test "error monad with an exception" do
+  test "error xonad with an exception" do
     f = fn() ->
-      M.error do
+      X.error do
         file = "/etc/passwd-does-not-exist"
         {:ok, bin} = throw(:unexpected)
         bin
@@ -58,9 +58,9 @@ defmodule Monad.Test do
     assert f.() == {:error, :unexpected}
   end
 
-  test "list monad" do
+  test "list xonad" do
     f = fn() ->
-      M.list do
+      X.list do
         a = 1
         a = a + 1
         a = a + 1
@@ -71,10 +71,10 @@ defmodule Monad.Test do
 
   ##
 
-  test "monad inside a monad" do
+  test "xonad inside a xonad" do
     f = fn() ->
-      M.identity do
-        M.error do
+      X.identity do
+        X.error do
           1
           {:ok, _} = :file.read_file("does_not_exist")
         end
@@ -83,9 +83,9 @@ defmodule Monad.Test do
     assert f.() == {:error, :enoent}
   end
 
-  test "monad failure" do
+  test "xonad failure" do
    f = fn() ->
-     M.identity do
+     X.identity do
        1 = (fn() -> 2 end).()
      end
    end
