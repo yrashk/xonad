@@ -5,13 +5,17 @@ defmodule Monad.Implementation do
   end 
 
   def monad([{:do, {:__block__, _line, block}}], module, opts) do
-    body = Enum.reduce block, module.empty(opts), 
-                       fn(expr, acc) ->
-                         module.bind(expr, module.return(acc))
-                       end
+    {:do, body} = Enum.reduce block, {:start, module.empty(opts)}, 
+                       (fn do
+                         expr, {:start, acc} ->
+                           {:do, module.bind(expr, acc)}
+                         expr, {:do, acc} ->
+                           {:do, module.bind(expr, module.return(acc))}
+                       end)
     quote do 
       try do
-        unquote(body)
+        m = unquote(body)
+        unquote(module).then(m)
       catch type, error -> unquote(module).exception(type, error) 
       end
     end
@@ -47,9 +51,35 @@ defmodule Monad do
     def empty(_) do
       nil
     end
+    def then(results), do: results
     def exception(_,e), do: throw(e)
   end 
   defmacro identity(block), do: with(Identity, block)
+
+  defmodule List do
+    use Monad.Implementation
+
+    def return(x) do
+      quote do: [unquote(x)]
+    end
+    def bind(block, result) do
+      quote do
+        _tail = unquote(result)
+        _v = unquote(block)
+        [_v|_tail]
+      end
+    end
+    def empty(_) do
+      quote do: []
+    end
+    def then([h|t]) do
+        List.concat(lc i in t, do: then(i)) ++ [h]
+    end
+    def then(v), do: v
+
+    def exception(_,e), do: throw(e)
+  end 
+  defmacro list(block), do: with(List, block)
 
   defmodule Error do
     use Monad.Implementation
@@ -77,9 +107,11 @@ defmodule Monad do
     def empty(_) do
       quote do: {:ok, nil}
     end
+    def then(results), do: results
     def exception(_,{:badmatch, {:error, _} = error}), do: error
     def exception(_,e), do: throw(e)
   end
+
   defmacro error(block), do: with(Error, block)
 
 end

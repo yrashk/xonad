@@ -36,4 +36,15 @@ defmodule Monad.Test do
     assert f.() == {:error, :enoent}
   end
 
+  test "list monad" do
+    f = fn() ->
+      M.list do
+        a = 1
+        a = a + 1
+        a = a + 1
+      end
+    end
+    assert f.() == [1,2,3]
+  end
+
 end
