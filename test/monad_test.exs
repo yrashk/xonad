@@ -69,4 +69,18 @@ defmodule Monad.Test do
     assert f.() == [1,2,3]
   end
 
+  ##
+
+  test "monad inside a monad" do
+    f = fn() ->
+      M.identity do
+        M.error do
+          1
+          {:ok, _} = :file.read_file("does_not_exist")
+        end
+      end
+    end
+    assert f.() == {:error, :enoent}
+  end
+
 end
