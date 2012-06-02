@@ -30,6 +30,9 @@ defmodule Monad.Implementation do
      def __with__(block, opts) do
        Monad.Implementation.monad(block, unquote(__CALLER__.module), opts)
      end
+     def then(r), do: r
+     def exception(_, e), do: throw(e)
+     defoverridable [then: 1, exception: 2]
     end
   end
 end
@@ -51,8 +54,6 @@ defmodule Monad do
     def empty(_) do
       nil
     end
-    def then(results), do: results
-    def exception(_,e), do: throw(e)
   end 
   defmacro identity(block), do: with(Identity, block)
 
@@ -75,9 +76,6 @@ defmodule Monad do
     def then([h|t]) do
         List.concat(lc i in t, do: then(i)) ++ [h]
     end
-    def then(v), do: v
-
-    def exception(_,e), do: throw(e)
   end 
   defmacro list(block), do: with(List, block)
 
@@ -107,9 +105,8 @@ defmodule Monad do
     def empty(_) do
       quote do: {:ok, nil}
     end
-    def then(results), do: results
     def exception(_,{:badmatch, {:error, _} = error}), do: error
-    def exception(_,e), do: throw(e)
+    def exception(_,_), do: super
   end
 
   defmacro error(block), do: with(Error, block)
