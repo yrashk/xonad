@@ -106,7 +106,7 @@ defmodule Monad do
       quote do: {:ok, nil}
     end
     def exception(_,{:badmatch, {:error, _} = error}), do: error
-    def exception(_,_), do: super
+    def exception(_,error), do: {:error, error}
   end
 
   defmacro error(block), do: with(Error, block)

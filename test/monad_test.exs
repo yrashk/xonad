@@ -29,11 +29,33 @@ defmodule Monad.Test do
     f = fn() ->
       M.error do
         file = "/etc/passwd-does-not-exist"
+        :file.read_file(file)
+        :done
+      end
+    end
+    assert f.() == {:error, :enoent}
+  end
+
+  test "error monad with a badmatch error" do
+    f = fn() ->
+      M.error do
+        file = "/etc/passwd-does-not-exist"
         {:ok, bin} = :file.read_file(file)
         bin
       end
     end
     assert f.() == {:error, :enoent}
+  end
+
+  test "error monad with an exception" do
+    f = fn() ->
+      M.error do
+        file = "/etc/passwd-does-not-exist"
+        {:ok, bin} = throw(:unexpected)
+        bin
+      end
+    end
+    assert f.() == {:error, :unexpected}
   end
 
   test "list monad" do
