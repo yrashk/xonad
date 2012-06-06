@@ -80,7 +80,7 @@ defmodule Xonad do
       quote do: []
     end
     def then([h|t]) do
-        List.concat(lc i in t, do: then(i)) ++ [h]
+        List.concat(lc i inlist t, do: then(i)) ++ [h]
     end
   end 
   defmacro list(block), do: with(List, block)
