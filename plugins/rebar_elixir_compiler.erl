@@ -91,7 +91,7 @@ dotex_compile(Config, OutDir, MoreSources) ->
     case Loaded of
         true ->
             application:start(elixir),
-            FirstExs = rebar_config:get_list(Config, ex_first_files, []),
+            FirstExs = rebar_config:get_local(Config, ex_first_files, []),
             ExOpts = ex_opts(Config),
             %% Support the src_dirs option allowing multiple directories to
             %% contain elixir source. This might be used, for example, should
@@ -170,7 +170,7 @@ is_newer(Files, Time) ->
               end, [ filelib:last_modified(File) || File <- Files ]).
 
 ex_opts(Config) ->
-    rebar_config:get(Config, ex_opts, [{ignore_module_conflict, true}]).
+    rebar_config:get_local(Config, ex_opts, [{ignore_module_conflict, true}]).
 
 gather_src([], Srcs) ->
     Srcs;
