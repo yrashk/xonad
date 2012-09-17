@@ -1,8 +1,8 @@
-defmodule Mix.Project do
+defmodule Expm.Mixfile do
+   use Mix.Project 
 
    def project do
-     [project: "Xonad", version: "0.1", 
-     compile_options: [ignore_module_conflict: true, docs: true]]
+     [project: "Xonad", version: "0.1", app: :xonad] 
    end
 
    def application, do: []

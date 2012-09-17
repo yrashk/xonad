@@ -6,7 +6,7 @@ defmodule Xonad.Implementation do
 
   def xonad([{:do, {:__block__, _line, block}}], module, opts) do
     {:do, body} = Enum.reduce block, {:start, module.empty(opts)}, 
-                       (fn do
+                       (function do
                          expr, {:start, acc} ->
                            {:do, module.bind(expr, acc)}
                          expr, {:do, acc} ->
