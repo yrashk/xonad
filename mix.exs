@@ -1,4 +1,4 @@
-defmodule Expm.Mixfile do
+defmodule Xonad.Mixfile do
    use Mix.Project 
 
    def project do
